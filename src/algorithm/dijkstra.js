@@ -5,9 +5,14 @@
 export function dijkstra(grid, startNode, finishNode) {
     const visitedNodesInOrder = [];
     startNode.distance = 0;
+    console.log(startNode)
     const unvisitedNodes = getAllNodes(grid);
+    console.log(unvisitedNodes)
+    // !! converts to boolean
     while (!!unvisitedNodes.length) {
+      // we sort an array: array item which property calles 'distance' is lowest will be first.
       sortNodesByDistance(unvisitedNodes);
+      // closestNode is node with shortest distance
       const closestNode = unvisitedNodes.shift();
       // If we encounter a wall, we skip it.
       if (closestNode.isWall) continue;
@@ -15,6 +20,7 @@ export function dijkstra(grid, startNode, finishNode) {
       // we must be trapped and should therefore stop.
       if (closestNode.distance === Infinity) return visitedNodesInOrder;
       closestNode.isVisited = true;
+      console.log('closest node is ' + closestNode );
       visitedNodesInOrder.push(closestNode);
       if (closestNode === finishNode) return visitedNodesInOrder;
       updateUnvisitedNeighbors(closestNode, grid);
