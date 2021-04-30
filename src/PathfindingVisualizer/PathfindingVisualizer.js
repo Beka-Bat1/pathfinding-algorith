@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Node from './Node/Node';
 import {dijkstra, getNodesInShortestPathOrder} from '../algorithm/dijkstra';
-
+import {astar} from '../algorithm/aStar'
 import './PathfindingVisualizer.css';
 
 const START_NODE_ROW = 10;
@@ -10,16 +10,15 @@ const FINISH_NODE_ROW = 10;
 const FINISH_NODE_COL = 35;
 
 export default class PathfindingVisualizer extends Component {
-  constructor() {
-    super();
-    this.state = {
+    state = {
       grid: [],
       mouseIsPressed: false,
     };
-  }
+  
 
   componentDidMount() {
     const grid = getInitialGrid();
+    console.log(grid)
     this.setState({grid});
   }
 
@@ -68,7 +67,8 @@ export default class PathfindingVisualizer extends Component {
     const {grid} = this.state;
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+    // const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+    const visitedNodesInOrder = dijkstra(grid, startNode, finishNode )
     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateDijkstra(visitedNodesInOrder, nodesInShortestPathOrder);
   }

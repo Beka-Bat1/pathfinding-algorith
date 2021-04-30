@@ -5,12 +5,10 @@
 export function dijkstra(grid, startNode, finishNode) {
     const visitedNodesInOrder = [];
     startNode.distance = 0;
-    console.log(startNode)
     const unvisitedNodes = getAllNodes(grid);
-    console.log(unvisitedNodes)
     // !! converts to boolean
     while (!!unvisitedNodes.length) {
-      // we sort an array: array item which property calles 'distance' is lowest will be first.
+      // we sort an array: array item, which 'distance' is the Lowest will be first.
       sortNodesByDistance(unvisitedNodes);
       // closestNode is node with shortest distance
       const closestNode = unvisitedNodes.shift();
@@ -20,7 +18,6 @@ export function dijkstra(grid, startNode, finishNode) {
       // we must be trapped and should therefore stop.
       if (closestNode.distance === Infinity) return visitedNodesInOrder;
       closestNode.isVisited = true;
-      console.log('closest node is ' + closestNode );
       visitedNodesInOrder.push(closestNode);
       if (closestNode === finishNode) return visitedNodesInOrder;
       updateUnvisitedNeighbors(closestNode, grid);
@@ -28,6 +25,7 @@ export function dijkstra(grid, startNode, finishNode) {
   }
   
   function sortNodesByDistance(unvisitedNodes) {
+    // sort nodes by distance of ascending order
     unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
   }
   
@@ -38,13 +36,17 @@ export function dijkstra(grid, startNode, finishNode) {
       neighbor.previousNode = node;
     }
   }
-  
+  // search for neighbours
   function getUnvisitedNeighbors(node, grid) {
     const neighbors = [];
     const {col, row} = node;
+    // up
     if (row > 0) neighbors.push(grid[row - 1][col]);
+    // down
     if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
+    // left
     if (col > 0) neighbors.push(grid[row][col - 1]);
+    // right
     if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
     return neighbors.filter(neighbor => !neighbor.isVisited);
   }
@@ -56,6 +58,7 @@ export function dijkstra(grid, startNode, finishNode) {
         nodes.push(node);
       }
     }
+
     return nodes;
   }
   
