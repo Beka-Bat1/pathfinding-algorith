@@ -1,7 +1,11 @@
+import {getAllNodes, sortNodesByDistance} from './basicFuncs/basicFunctions';
+
+
 // Performs Dijkstra's algorithm; returns *all* nodes in the order
 // in which they were visited. Also makes nodes point back to their
 // previous node, effectively allowing us to compute the shortest path
 // by backtracking from the finish node.
+
 export function dijkstra(grid, startNode, finishNode) {
     const visitedNodesInOrder = [];
     startNode.distance = 0;
@@ -24,10 +28,7 @@ export function dijkstra(grid, startNode, finishNode) {
     }
   }
   
-  function sortNodesByDistance(unvisitedNodes) {
-    // sort nodes by distance of ascending order
-    unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
-  }
+  
   
   function updateUnvisitedNeighbors(node, grid) {
     const unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
@@ -51,16 +52,6 @@ export function dijkstra(grid, startNode, finishNode) {
     return neighbors.filter(neighbor => !neighbor.isVisited);
   }
   
-  function getAllNodes(grid) {
-    const nodes = [];
-    for (const row of grid) {
-      for (const node of row) {
-        nodes.push(node);
-      }
-    }
-
-    return nodes;
-  }
   
   // Backtracks from the finishNode to find the shortest path.
   // Only works when called *after* the dijkstra method above.
