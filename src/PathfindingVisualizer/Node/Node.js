@@ -11,6 +11,7 @@ export default class Node extends Component {
       isWall,
       onMouseDown,
       onMouseEnter,
+      onMouseLeave,
       onMouseUp,
       row,
     } = this.props;
@@ -28,7 +29,9 @@ export default class Node extends Component {
         className={`node ${extraClassName}`}
         onMouseDown={() => onMouseDown(row, col)}
         onMouseEnter={() => onMouseEnter(row, col)}
-        onMouseUp={() => onMouseUp()}></div>
+        onMouseLeave={() => onMouseLeave(row, col)}
+        onMouseUp={() => onMouseUp()}
+        ></div>
     );
   }
 }
