@@ -12,10 +12,15 @@ export function bfs(grid, startNode, finishNode) {
   while (!!unvisitedNeighbors.length) {
     // Handle the node in the front of the line
     let currentNode = unvisitedNeighbors.shift();
+
     // check as it's not a wall
     if (!currentNode.isWall) {
+      visitedNodesInOrder.push(currentNode);
+
       // Terminate if the goal is reached
-      if (currentNode === finishNode) return visitedNodesInOrder;
+      if (currentNode === finishNode || currentNode === undefined){
+        return visitedNodesInOrder;
+      } 
       // Terminate if goal can't be reached
       if (currentNode.distance === Infinity) return visitedNodesInOrder;
       // Handle neighbors
@@ -25,7 +30,6 @@ export function bfs(grid, startNode, finishNode) {
         let neighbor = neighbors[i];
         if (neighbor.isWall) continue;
         neighbor.isVisited = true;
-        visitedNodesInOrder.push(currentNode);
         neighbor.distance = currentNode.distance + 1;
         neighbor.previousNode = currentNode;
         unvisitedNeighbors.push(neighbor);

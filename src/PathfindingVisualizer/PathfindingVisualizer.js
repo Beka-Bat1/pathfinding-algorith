@@ -6,80 +6,251 @@ import { dfs } from "../algorithm/dfs";
 import { bfs } from "../algorithm/bfs";
 import "./PathfindingVisualizer.css";
 
-const START_NODE_ROW = 10;
-const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 10;
-const FINISH_NODE_COL = 35;
-
 export default class PathfindingVisualizer extends Component {
   state = {
+    START_NODE_ROW: 10,
+    START_NODE_COL: 15,
+    FINISH_NODE_ROW: 10,
+    FINISH_NODE_COL: 35,
     grid: [],
+    currRow: 1,
+    currCol: 1,
     mouseIsPressed: false,
-    whichNodeIsPicked: null,
+    whichNodeIsPicked: "",
     isRunning: false,
   };
 
   componentDidMount() {
-    const grid = getInitialGrid();
+    const grid = this.getInitialGrid();
     this.setState({ grid: grid });
   }
 
+  // handleMouseDown(row, col) {
+  //   let startNodePicked = Boolean(this.state.grid[row][col].isStart);
+  //   let endNodePicked = Boolean(this.state.grid[row][col].isFinish);
+  //   if (startNodePicked) {
+  //     this.setState({ whichNodeIsPicked: "isStart" });
+  //     setTimeout(() => {console.log(this.state.whichNodeIsPicked)}, 1000)
+
+  //   } else if (endNodePicked) {
+  //     this.setState({ whichNodeIsPicked: "isFinish" });
+  //   } else if (!startNodePicked || !endNodePicked) {
+  //     console.log('you chose a wall ... ')
+  //     this.setState({ whichNodeIsPicked: "isWall" });
+  //   }
+  //   const newGrid = getNewGridWithWallToggled(
+  //     this.state.grid,
+  //     row,
+  //     col,
+  //     this.state.whichNodeIsPicked
+  //   );
+  //   this.setState({ mouseIsPressed: true, grid: newGrid });
+  // }
+
+  // handleMouseEnter(row, col) {
+  //    if (!this.state.mouseIsPressed) return;
+  //   console.log('time to change on Mouse Enter ...')
+  //   const newGrid = getNewGridWithWallToggled(
+  //     this.state.grid,
+  //     row,
+  //     col,
+  //     this.state.whichNodeIsPicked
+  //   );
+  //   this.setState({ grid: newGrid });
+  // }
+
+  // handleMouseLeave(row, col) {
+  //   if (this.state.whichNodeIsPicked !== 'isStart' && this.state.whichNodeIsPicked !== 'isFinish') return;
+  //     console.log('time to chenge node position on mouse leave .....')
+  //     const newGrid = getNewGridWithWallToggled(
+  //       this.state.grid,
+  //       row,
+  //       col,
+  //       this.state.whichNodeIsPicked
+  //     );
+  //     this.setState({ grid: newGrid });
+  // }
+
+  // handleMouseUp() {
+  //   if (this.state.whichNodeIsPicked !== "isWall") {
+  //     console.log('asdasdasda')
+  //     this.setState({ whichNodeIsPicked: '' });
+  //     setTimeout(() => {console.log(this.state.whichNodeIsPicked)}, 1000)
+  //   }
+  //   this.setState({ mouseIsPressed: false });
+  // }
+
+  /******************** Control mouse events ********************/
   handleMouseDown(row, col) {
-    let startNodePicked = Boolean(this.state.grid[row][col].isStart);
-    let endNodePicked = Boolean(this.state.grid[row][col].isFinish);
-    if (startNodePicked) {
-      console.log("startNode is Picked");
-      // document.getElementById(`node-${row}-${col}`).className = 'node';
-      this.setState({ whichNodeIsPicked: "isStart" });
-      console.log(this.state.whichNodeIsPicked);
-    } else if (endNodePicked) {
-      document.getElementById(`node-${row}-${col}`).className = "node";
-      this.setState({ whichNodeIsPicked: "isFinish" });
-    } else if (!startNodePicked || !endNodePicked) {
-      this.setState({ whichNodeIsPicked: "isWall" });
+    if (!this.state.isRunning) {
+      if (this.isGridClear()) {
+        if (
+          document.getElementById(`node-${row}-${col}`).className ===
+          "node node-start"
+        ) {
+          this.setState({
+            mouseIsPressed: true,
+            isStartNode: true,
+            currRow: row,
+            currCol: col,
+          });
+        } else if (
+          document.getElementById(`node-${row}-${col}`).className ===
+          "node node-finish"
+        ) {
+          this.setState({
+            mouseIsPressed: true,
+            isFinishNode: true,
+            currRow: row,
+            currCol: col,
+          });
+        } else {
+          const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+          this.setState({
+            grid: newGrid,
+            mouseIsPressed: true,
+            isWallNode: true,
+            currRow: row,
+            currCol: col,
+          });
+        }
+      } else {
+        this.clearGrid();
+      }
     }
-    const newGrid = getNewGridWithWallToggled(
-      this.state.grid,
-      row,
-      col,
-      this.state.whichNodeIsPicked
-    );
-    this.setState({ mouseIsPressed: true, grid: newGrid });
+  }
+
+  isGridClear() {
+    for (const row of this.state.grid) {
+      for (const node of row) {
+        const nodeClassName = document.getElementById(
+          `node-${node.row}-${node.col}`
+        ).className;
+        if (
+          nodeClassName === "node node-visited" ||
+          nodeClassName === "node node-shortest-path"
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   handleMouseEnter(row, col) {
-    if (!this.state.mouseIsPressed) return;
+    if (!this.state.isRunning) {
+      if (this.state.mouseIsPressed) {
+        const nodeClassName = document.getElementById(`node-${row}-${col}`)
+          .className;
+        if (this.state.isStartNode) {
+          if (nodeClassName !== "node node-wall") {
+            const prevStartNode = this.state.grid[this.state.currRow][
+              this.state.currCol
+            ];
+            prevStartNode.isStart = false;
+            document.getElementById(
+              `node-${this.state.currRow}-${this.state.currCol}`
+            ).className = "node";
 
-    const newGrid = getNewGridWithWallToggled(
-      this.state.grid,
-      row,
+            this.setState({ currRow: row, currCol: col });
+            const currStartNode = this.state.grid[row][col];
+            currStartNode.isStart = true;
+            document.getElementById(`node-${row}-${col}`).className =
+              "node node-start";
+          }
+          this.setState({ START_NODE_ROW: row, START_NODE_COL: col });
+        } else if (this.state.isFinishNode) {
+          if (nodeClassName !== "node node-wall") {
+            const prevFinishNode = this.state.grid[this.state.currRow][
+              this.state.currCol
+            ];
+            prevFinishNode.isFinish = false;
+            document.getElementById(
+              `node-${this.state.currRow}-${this.state.currCol}`
+            ).className = "node";
+
+            this.setState({ currRow: row, currCol: col });
+            const currFinishNode = this.state.grid[row][col];
+            currFinishNode.isFinish = true;
+            document.getElementById(`node-${row}-${col}`).className =
+              "node node-finish";
+          }
+          this.setState({ FINISH_NODE_ROW: row, FINISH_NODE_COL: col });
+        } else if (this.state.isWallNode) {
+          const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+          this.setState({ grid: newGrid });
+        }
+      }
+    }
+  }
+
+  handleMouseUp(row, col) {
+    if (!this.state.isRunning) {
+      this.setState({ mouseIsPressed: false });
+      if (this.state.isStartNode) {
+        const isStartNode = !this.state.isStartNode;
+        this.setState({
+          isStartNode,
+          START_NODE_ROW: row,
+          START_NODE_COL: col,
+        });
+      } else if (this.state.isFinishNode) {
+        const isFinishNode = !this.state.isFinishNode;
+        this.setState({
+          isFinishNode,
+          FINISH_NODE_ROW: row,
+          FINISH_NODE_COL: col,
+        });
+      }
+      // this.componentDidMount();
+    }
+  }
+
+  handleMouseLeave() {
+    if (this.state.isStartNode) {
+      const isStartNode = !this.state.isStartNode;
+      this.setState({ isStartNode, mouseIsPressed: false });
+    } else if (this.state.isFinishNode) {
+      const isFinishNode = !this.state.isFinishNode;
+      this.setState({ isFinishNode, mouseIsPressed: false });
+    } else if (this.state.isWallNode) {
+      const isWallNode = !this.state.isWallNode;
+      this.setState({ isWallNode, mouseIsPressed: false });
+      this.componentDidMount()
+    }
+  }
+
+  /* mouse evets ^ */
+
+ getInitialGrid = () => {
+    const grid = [];
+    for (let row = 0; row < 20; row++) {
+      const currentRow = [];
+      for (let col = 0; col < 50; col++) {
+        currentRow.push(this.createNode(col, row));
+      }
+      grid.push(currentRow);
+    }
+    return grid;
+  };
+
+   createNode = (col, row) => {
+    return {
       col,
-      this.state.whichNodeIsPicked
-    );
-    this.setState({ grid: newGrid });
-  }
-
-  handleMouseLeave(row, col) {
-    if (this.state.mouseIsPressed) {
-      const newGrid = getNewGridWithWallToggled(
-        this.state.grid,
-        row,
-        col,
-        this.state.whichNodeIsPicked
-      );
-      this.setState({ grid: newGrid });
-      console.log("mouse left the node");
-    }
-  }
-
-  handleMouseUp() {
-    if (this.state.whichNodeIsPicked !== "isWall") {
-      this.setState({ whichNodeIsPicked: null });
-    }
-    this.setState({ mouseIsPressed: false });
-  }
+      row,
+      isStart:
+        row === this.state.START_NODE_ROW && col === this.state.START_NODE_COL,
+      isFinish:
+        row === this.state.FINISH_NODE_ROW && col === this.state.FINISH_NODE_COL,
+      distance: Infinity,
+      isVisited: false,
+      isWall: false,
+      previousNode: null,
+    };
+  };
 
   clearGrid() {
+    console.log(this.state.isRunning);
     if (!this.state.isRunning) {
       const newGrid = this.state.grid.slice();
       for (let row of newGrid) {
@@ -96,6 +267,7 @@ export default class PathfindingVisualizer extends Component {
               "node";
             node.isVisited = false;
             node.distance = Infinity;
+            node.isWall = false;
           }
           if (nodeClassName === "node node-finish") {
             document.getElementById(`node-${node.row}-${node.col}`).className =
@@ -115,10 +287,12 @@ export default class PathfindingVisualizer extends Component {
           }
         }
       }
+      this.setState({grid: newGrid })
     }
   }
 
   animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
+    console.log(visitedNodesInOrder)
     for (let i = 1; i <= visitedNodesInOrder.length - 1; i++) {
       if (i === visitedNodesInOrder.length - 1) {
         setTimeout(() => {
@@ -142,19 +316,22 @@ export default class PathfindingVisualizer extends Component {
           "node node-shortest-path";
       }, 50 * i);
     }
+    this.setState({isRunning: false})
   }
 
   visualizeAlgorithm(algorithmName) {
     const { grid } = this.state;
-    const startNode = grid[START_NODE_ROW][START_NODE_COL];
-    const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
+    this.setState({isRunning: true})
+    const startNode =
+      grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+    const finishNode =
+      grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
 
     let visitedNodesInOrder;
     let nodesInShortestPathOrder;
 
     switch (algorithmName) {
       case "dijkstra":
-        // const visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
         visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
         break;
 
@@ -213,10 +390,7 @@ export default class PathfindingVisualizer extends Component {
                       onMouseEnter={(row, col) =>
                         this.handleMouseEnter(row, col)
                       }
-                      onMouseLeave={(row, col) =>
-                        this.handleMouseLeave(row, col)
-                      }
-                      onMouseUp={() => this.handleMouseUp()}
+                      onMouseUp={() => this.handleMouseUp(row, col)}
                       row={row}
                     ></Node>
                   );
@@ -230,41 +404,18 @@ export default class PathfindingVisualizer extends Component {
   }
 }
 
-const getInitialGrid = () => {
-  const grid = [];
-  for (let row = 0; row < 20; row++) {
-    const currentRow = [];
-    for (let col = 0; col < 50; col++) {
-      currentRow.push(createNode(col, row));
-    }
-    grid.push(currentRow);
-  }
-  return grid;
-};
 
-const createNode = (col, row) => {
-  return {
-    col,
-    row,
-    isStart: row === START_NODE_ROW && col === START_NODE_COL,
-    isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
-    distance: Infinity,
-    isVisited: false,
-    isWall: false,
-    previousNode: null,
-  };
-};
 
 // helps MOUSE EVENTS with changing node properties
-const getNewGridWithWallToggled = (grid, row, col, whichNodeIsPicked) => {
+const getNewGridWithWallToggled = (grid, row, col) => {
   const newGrid = grid.slice();
   const node = newGrid[row][col];
-  let newNode = {
-    ...node,
-    isWall: whichNodeIsPicked === "isWall" ? !node.isWall : node.isWall,
-    isStart: whichNodeIsPicked === "isStart" ? !node.isStart : node.isStart,
-    isFinish: whichNodeIsPicked === "isFinish" ? !node.isFinish : node.isFinish,
-  };
-  newGrid[row][col] = newNode;
+  if (!node.isStart && !node.isFinish) {
+    let newNode = {
+      ...node,
+      isWall: !node.isWall,
+    };
+    newGrid[row][col] = newNode;
+  }
   return newGrid;
 };

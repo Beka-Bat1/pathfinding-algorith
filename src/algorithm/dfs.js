@@ -14,10 +14,10 @@ export function dfs(grid, startNode, finishNode) {
     // Handle the node in the front of the line
     const currentNode = unvisitedNodes.pop();
     // Terminate if the goal is reached
-    if (currentNode === finishNode) return visitedNodesInOrder;
+    if (currentNode === finishNode || currentNode === undefined) return visitedNodesInOrder;
     // Take unvisited neighbors in order
+    if (currentNode.distance === Infinity) return visitedNodesInOrder;
     if (!currentNode.isWall) {
-      if (currentNode.distance === Infinity) return visitedNodesInOrder;
       currentNode.isVisited = true;
       visitedNodesInOrder.push(currentNode);
       if (currentNode === finishNode) return visitedNodesInOrder;
