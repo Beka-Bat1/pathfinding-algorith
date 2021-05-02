@@ -5,6 +5,11 @@ import { astar } from "../algorithm/aStar";
 import { dfs } from "../algorithm/dfs";
 import { bfs } from "../algorithm/bfs";
 import "./PathfindingVisualizer.css";
+import {
+  generateRandomWalls,
+  generateMaze,
+  mazeAnimation,
+} from "../algorithm/mazeAlgorithm";
 
 export default class PathfindingVisualizer extends Component {
   state = {
@@ -82,6 +87,8 @@ export default class PathfindingVisualizer extends Component {
 
   /******************** Control mouse events ********************/
   handleMouseDown(row, col) {
+    console.log(this.state.isRunning);
+    console.log(this.state.grid[row][col]);
     if (!this.state.isRunning) {
       if (this.isGridClear()) {
         if (
@@ -216,13 +223,13 @@ export default class PathfindingVisualizer extends Component {
     } else if (this.state.isWallNode) {
       const isWallNode = !this.state.isWallNode;
       this.setState({ isWallNode, mouseIsPressed: false });
-      this.componentDidMount()
+      this.componentDidMount();
     }
   }
 
   /* mouse evets ^ */
 
- getInitialGrid = () => {
+  getInitialGrid = () => {
     const grid = [];
     for (let row = 0; row < 20; row++) {
       const currentRow = [];
@@ -234,14 +241,15 @@ export default class PathfindingVisualizer extends Component {
     return grid;
   };
 
-   createNode = (col, row) => {
+  createNode = (col, row) => {
     return {
       col,
       row,
       isStart:
         row === this.state.START_NODE_ROW && col === this.state.START_NODE_COL,
       isFinish:
-        row === this.state.FINISH_NODE_ROW && col === this.state.FINISH_NODE_COL,
+        row === this.state.FINISH_NODE_ROW &&
+        col === this.state.FINISH_NODE_COL,
       distance: Infinity,
       isVisited: false,
       isWall: false,
@@ -287,12 +295,12 @@ export default class PathfindingVisualizer extends Component {
           }
         }
       }
-      this.setState({grid: newGrid })
+      this.setState({ grid: newGrid });
     }
   }
 
   animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
-    console.log(visitedNodesInOrder)
+    console.log(visitedNodesInOrder);
     for (let i = 1; i <= visitedNodesInOrder.length - 1; i++) {
       if (i === visitedNodesInOrder.length - 1) {
         setTimeout(() => {
@@ -316,12 +324,12 @@ export default class PathfindingVisualizer extends Component {
           "node node-shortest-path";
       }, 50 * i);
     }
-    this.setState({isRunning: false})
+    this.setState({ isRunning: false });
   }
 
   visualizeAlgorithm(algorithmName) {
     const { grid } = this.state;
-    this.setState({isRunning: true})
+    this.setState({ isRunning: true });
     const startNode =
       grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
     const finishNode =
@@ -346,10 +354,20 @@ export default class PathfindingVisualizer extends Component {
       case "bfs":
         visitedNodesInOrder = bfs(grid, startNode, finishNode);
         break;
-
+      case "randomWalls":
+        let tmp = generateRandomWalls(grid, startNode, finishNode);
+        mazeAnimation(tmp);
+        this.setState({ isRunning: false });
+        return;
+      case "maze":
+         let wallsToAnimate = generateMaze(grid);
+        mazeAnimation(wallsToAnimate);
+        this.setState({ isRunning: false });
+        return;
       default:
         break;
     }
+    console.log("still continued ..............");
     nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
   }
@@ -372,6 +390,12 @@ export default class PathfindingVisualizer extends Component {
           Visualize Breadth First Search Algorithm
         </button>
         <button onClick={() => this.clearGrid()}>Clear Graph</button>
+        <button onClick={() => this.visualizeAlgorithm("randomWalls")}>
+          Deploy random walls
+        </button>
+        <button onClick={() => this.visualizeAlgorithm("maze")}>
+          Generate Maze
+        </button>
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
@@ -403,8 +427,6 @@ export default class PathfindingVisualizer extends Component {
     );
   }
 }
-
-
 
 // helps MOUSE EVENTS with changing node properties
 const getNewGridWithWallToggled = (grid, row, col) => {
