@@ -1,31 +1,7 @@
 
 
-export function mazeAnimation(wallsToAnimate) {
-  console.log(wallsToAnimate);
-
-  let nodes = wallsToAnimate.slice();
-
-  function timeout(index) {
-    setTimeout(function () {
-      if (index === nodes.length) {
-        wallsToAnimate = [];
-        return;
-      }
-      let node = nodes[index];
-      document.getElementById(`node-${node.row}-${node.col}`).className =
-        "node node-wall";
-      node.isWall = true;
-
-      timeout(index + 1);
-    }, 15);
-  }
-
-  timeout(0);
-}
-
 export function generateRandomWalls(nodes) {
   let visitedNodesInOrder = [];
-
   nodes.map((row) => {
     row.map((node) => {
       if (node.isStart || node.isFinish) return;
@@ -36,8 +12,6 @@ export function generateRandomWalls(nodes) {
       }
     });
   });
-
-  console.log(visitedNodesInOrder);
   return visitedNodesInOrder;
 }
 
@@ -84,14 +58,13 @@ export function generateMaze(
       surroundingWalls = true;
     }
 
-
     if (orientation === "horizontal") {
       let possibleRows = [];
       for (let number = rowStart; number <= rowEnd; number += 2) {
         possibleRows.push(number);
       }
       let possibleCols = [];
-      for (let number = colStart -1; number <= colEnd+1 ; number += 2) {
+      for (let number = colStart - 1; number <= colEnd + 1; number += 2) {
         possibleCols.push(number);
       }
       let randomRowIndex = Math.floor(Math.random() * possibleRows.length);
@@ -132,7 +105,7 @@ export function generateMaze(
           colStart,
           colEnd,
           "vertical",
-          surroundingWalls,
+          surroundingWalls
         );
       }
       if (rowEnd - (currentRow + 2) > colEnd - colStart) {
@@ -143,7 +116,7 @@ export function generateMaze(
           colStart,
           colEnd,
           orientation,
-          surroundingWalls,
+          surroundingWalls
         );
       } else {
         recursiveMaze(
@@ -153,7 +126,7 @@ export function generateMaze(
           colStart,
           colEnd,
           "vertical",
-          surroundingWalls,
+          surroundingWalls
         );
       }
     } else {
@@ -191,7 +164,7 @@ export function generateMaze(
           colStart,
           currentCol - 2,
           "horizontal",
-          surroundingWalls,
+          surroundingWalls
         );
       } else {
         recursiveMaze(
@@ -201,7 +174,7 @@ export function generateMaze(
           colStart,
           currentCol - 2,
           orientation,
-          surroundingWalls,
+          surroundingWalls
         );
       }
       if (rowEnd - rowStart > colEnd - (currentCol + 2)) {
@@ -212,7 +185,7 @@ export function generateMaze(
           currentCol + 2,
           colEnd,
           "horizontal",
-          surroundingWalls,
+          surroundingWalls
         );
       } else {
         recursiveMaze(
@@ -222,7 +195,7 @@ export function generateMaze(
           currentCol + 2,
           colEnd,
           orientation,
-          surroundingWalls,
+          surroundingWalls
         );
       }
     }
@@ -241,7 +214,7 @@ export function generateMaze(
   );
 
   console.log(wallsToAnimate);
-  return wallsToAnimate
+  return wallsToAnimate;
 }
 
 //   for (let row of nodes) {

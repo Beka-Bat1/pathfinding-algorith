@@ -89,7 +89,6 @@ export default class PathfindingVisualizer extends Component {
   /******************** Control mouse events ********************/
   handleMouseDown(row, col) {
     console.log(this.state.isRunning);
-    console.log(this.state.grid[row][col]);
     if (!this.state.isRunning) {
       if (this.isGridClear()) {
         if (
@@ -259,7 +258,8 @@ export default class PathfindingVisualizer extends Component {
   };
 
   clearGrid() {
-    console.log(this.state.isRunning);
+    console.log("this must be true to continue");
+    console.log(!this.state.isRunning);
     if (!this.state.isRunning) {
       const newGrid = this.state.grid.slice();
       for (let row of newGrid) {
@@ -277,12 +277,14 @@ export default class PathfindingVisualizer extends Component {
             node.isVisited = false;
             node.distance = Infinity;
             node.isWall = false;
+            node.previousNode = null;
           }
           if (nodeClassName === "node node-finish") {
             document.getElementById(`node-${node.row}-${node.col}`).className =
               "node node-finish";
             node.isVisited = false;
             node.distance = Infinity;
+            node.previousNode = null;
           }
           if (nodeClassName === "node node-start") {
             document.getElementById(`node-${node.row}-${node.col}`).className =
@@ -291,8 +293,6 @@ export default class PathfindingVisualizer extends Component {
             node.distance = Infinity;
             node.isStart = true;
             node.isWall = false;
-            node.previousNode = null;
-            node.isNode = true;
           }
         }
       }
@@ -301,20 +301,20 @@ export default class PathfindingVisualizer extends Component {
   }
 
   animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder) {
-    console.log(visitedNodesInOrder);
     for (let i = 1; i <= visitedNodesInOrder.length - 1; i++) {
       if (i === visitedNodesInOrder.length - 1) {
         setTimeout(() => {
           this.animateShortestPath(nodesInShortestPathOrder);
-        }, 10 * i);
-        return;
+        }, 7 * i);
+        break;
       }
       setTimeout(() => {
         const node = visitedNodesInOrder[i];
         document.getElementById(`node-${node.row}-${node.col}`).className =
           "node node-visited";
-      }, 10 * i);
+      }, 7 * i);
     }
+    this.setState({ isRunning: false });
   }
 
   animateShortestPath(nodesInShortestPathOrder) {
@@ -325,10 +325,34 @@ export default class PathfindingVisualizer extends Component {
           "node node-shortest-path";
       }, 50 * i);
     }
-    this.setState({ isRunning: false });
+    return;
+  }
+
+  mazeAnimation(wallsToAnimate) {
+    console.log(wallsToAnimate);
+  
+    let nodes = wallsToAnimate;
+  
+    function timeout(index) {
+      setTimeout(function () {
+        if (index === nodes.length) {
+          wallsToAnimate = [];
+          return true;
+        }
+        let node = nodes[index];
+        document.getElementById(`node-${node.row}-${node.col}`).className =
+          "node node-wall";
+        node.isWall = true;
+        timeout(index + 1);
+      }, 15);
+    }
+  
+    timeout(0);
   }
 
   visualizeAlgorithm(algorithmName) {
+    if (this.state.isRunning) return;
+
     const { grid } = this.state;
     this.setState({ isRunning: true });
     const startNode =
@@ -342,28 +366,45 @@ export default class PathfindingVisualizer extends Component {
     switch (algorithmName) {
       case "dijkstra":
         visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+        console.log(visitedNodesInOrder)
         break;
 
       case "aStar":
         visitedNodesInOrder = astar(grid, startNode, finishNode);
+        console.log(visitedNodesInOrder)
+
         break;
 
       case "dfs":
         visitedNodesInOrder = dfs(grid, startNode, finishNode);
+        console.log(visitedNodesInOrder)
         break;
 
       case "bfs":
         visitedNodesInOrder = bfs(grid, startNode, finishNode);
+        console.log('after function is done ......')
+        console.log(visitedNodesInOrder)
+
         break;
       case "randomWalls":
         let tmp = generateRandomWalls(grid, startNode, finishNode);
-        mazeAnimation(tmp);
+        this.mazeAnimation(tmp);
         this.setState({ isRunning: false });
         return;
       case "maze":
         let nodes = getAllNodes(grid);
-         let wallsToAnimate = generateMaze(nodes, 0, 20, 0, 50, 'horizontal', false, startNode, finishNode);
-        mazeAnimation(wallsToAnimate);
+        let wallsToAnimate = generateMaze(
+          nodes,
+          0,
+          20,
+          0,
+          50,
+          "horizontal",
+          false,
+          startNode,
+          finishNode
+        );
+        this.mazeAnimation(wallsToAnimate);
         this.setState({ isRunning: false });
         return;
       default:
