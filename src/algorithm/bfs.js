@@ -1,4 +1,4 @@
-import { getqueue, getUnvisitedNeighbors } from "./basicFuncs/basicFunctions";
+import { getUnvisitedNeighbors } from "./basicFuncs/basicFunctions";
 
 export function bfs(grid, startNode, finishNode) {
   startNode.distance = 0;
@@ -18,7 +18,7 @@ export function bfs(grid, startNode, finishNode) {
     // Handle neighbors
     visitedNodesInOrder.push(currentNode);
     currentNode.isVisited = true;
-    
+
     // Terminate if the goal is reached
     if (
       currentNode === finishNode ||

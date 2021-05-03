@@ -1,17 +1,15 @@
-
-
 export function generateRandomWalls(nodes) {
   let visitedNodesInOrder = [];
-  nodes.map((row) => {
-    row.map((node) => {
+  for (let row of nodes) {
+    for (let node of row) {
       if (node.isStart || node.isFinish) return;
-      let { col, row, ...nodeShit } = { ...node };
 
       if (Math.random() > 0.5) {
         visitedNodesInOrder.push(node);
       }
-    });
-  });
+    }
+  }
+
   return visitedNodesInOrder;
 }
 
@@ -213,7 +211,6 @@ export function generateMaze(
     finishNode
   );
 
-  console.log(wallsToAnimate);
   return wallsToAnimate;
 }
 

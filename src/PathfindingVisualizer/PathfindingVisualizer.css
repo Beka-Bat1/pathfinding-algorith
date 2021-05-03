@@ -1,5 +1,8 @@
 .grid{
-    margin: 100px 100px ;
+    min-height: 100vh;
+    width: fit-content;
+    margin: 100px auto;
+    
   }
 
 .row{

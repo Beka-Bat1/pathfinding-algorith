@@ -1,0 +1,13 @@
+.navbar{
+    height: 4em;
+    background-color: #264653 !important;
+    box-shadow: rgba(175, 216, 248, 0.1) 0px 20px 25px -5px, rgba(175, 216, 248, 0.04) 0px 10px 10px -5px;
+}
+
+.navbar > *{
+    font-size: 28px;
+}
+
+li{
+    padding: 4px;
+}

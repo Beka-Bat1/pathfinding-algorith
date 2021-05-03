@@ -1,16 +1,13 @@
 import React, { Component } from "react";
 import Node from "./Node/Node";
+import { getAllNodes } from "../algorithm/basicFuncs/basicFunctions";
 import { dijkstra, getNodesInShortestPathOrder } from "../algorithm/dijkstra";
 import { astar } from "../algorithm/aStar";
 import { dfs } from "../algorithm/dfs";
 import { bfs } from "../algorithm/bfs";
 import "./PathfindingVisualizer.css";
-import {
-  generateRandomWalls,
-  generateMaze,
-  mazeAnimation,
-} from "../algorithm/mazeAlgorithm";
-import { getAllNodes } from "../algorithm/basicFuncs/basicFunctions";
+import { generateRandomWalls, generateMaze } from "../algorithm/mazeAlgorithm";
+import Navbar from "../layout/Navbar";
 
 export default class PathfindingVisualizer extends Component {
   state = {
@@ -22,7 +19,6 @@ export default class PathfindingVisualizer extends Component {
     currRow: 1,
     currCol: 1,
     mouseIsPressed: false,
-    whichNodeIsPicked: "",
     isRunning: false,
   };
 
@@ -31,64 +27,8 @@ export default class PathfindingVisualizer extends Component {
     this.setState({ grid: grid });
   }
 
-  // handleMouseDown(row, col) {
-  //   let startNodePicked = Boolean(this.state.grid[row][col].isStart);
-  //   let endNodePicked = Boolean(this.state.grid[row][col].isFinish);
-  //   if (startNodePicked) {
-  //     this.setState({ whichNodeIsPicked: "isStart" });
-  //     setTimeout(() => {console.log(this.state.whichNodeIsPicked)}, 1000)
-
-  //   } else if (endNodePicked) {
-  //     this.setState({ whichNodeIsPicked: "isFinish" });
-  //   } else if (!startNodePicked || !endNodePicked) {
-  //     console.log('you chose a wall ... ')
-  //     this.setState({ whichNodeIsPicked: "isWall" });
-  //   }
-  //   const newGrid = getNewGridWithWallToggled(
-  //     this.state.grid,
-  //     row,
-  //     col,
-  //     this.state.whichNodeIsPicked
-  //   );
-  //   this.setState({ mouseIsPressed: true, grid: newGrid });
-  // }
-
-  // handleMouseEnter(row, col) {
-  //    if (!this.state.mouseIsPressed) return;
-  //   console.log('time to change on Mouse Enter ...')
-  //   const newGrid = getNewGridWithWallToggled(
-  //     this.state.grid,
-  //     row,
-  //     col,
-  //     this.state.whichNodeIsPicked
-  //   );
-  //   this.setState({ grid: newGrid });
-  // }
-
-  // handleMouseLeave(row, col) {
-  //   if (this.state.whichNodeIsPicked !== 'isStart' && this.state.whichNodeIsPicked !== 'isFinish') return;
-  //     console.log('time to chenge node position on mouse leave .....')
-  //     const newGrid = getNewGridWithWallToggled(
-  //       this.state.grid,
-  //       row,
-  //       col,
-  //       this.state.whichNodeIsPicked
-  //     );
-  //     this.setState({ grid: newGrid });
-  // }
-
-  // handleMouseUp() {
-  //   if (this.state.whichNodeIsPicked !== "isWall") {
-  //     console.log('asdasdasda')
-  //     this.setState({ whichNodeIsPicked: '' });
-  //     setTimeout(() => {console.log(this.state.whichNodeIsPicked)}, 1000)
-  //   }
-  //   this.setState({ mouseIsPressed: false });
-  // }
-
   /******************** Control mouse events ********************/
   handleMouseDown(row, col) {
-    console.log(this.state.isRunning);
     if (!this.state.isRunning) {
       if (this.isGridClear()) {
         if (
@@ -209,7 +149,6 @@ export default class PathfindingVisualizer extends Component {
           FINISH_NODE_COL: col,
         });
       }
-      // this.componentDidMount();
     }
   }
 
@@ -258,8 +197,6 @@ export default class PathfindingVisualizer extends Component {
   };
 
   clearGrid() {
-    console.log("this must be true to continue");
-    console.log(!this.state.isRunning);
     if (!this.state.isRunning) {
       const newGrid = this.state.grid.slice();
       for (let row of newGrid) {
@@ -329,10 +266,7 @@ export default class PathfindingVisualizer extends Component {
   }
 
   mazeAnimation(wallsToAnimate) {
-    console.log(wallsToAnimate);
-  
     let nodes = wallsToAnimate;
-  
     function timeout(index) {
       setTimeout(function () {
         if (index === nodes.length) {
@@ -346,15 +280,15 @@ export default class PathfindingVisualizer extends Component {
         timeout(index + 1);
       }, 15);
     }
-  
+
     timeout(0);
   }
 
   visualizeAlgorithm(algorithmName) {
     if (this.state.isRunning) return;
 
-    const { grid } = this.state;
     this.setState({ isRunning: true });
+    const { grid } = this.state;
     const startNode =
       grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
     const finishNode =
@@ -366,31 +300,26 @@ export default class PathfindingVisualizer extends Component {
     switch (algorithmName) {
       case "dijkstra":
         visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-        console.log(visitedNodesInOrder)
         break;
 
       case "aStar":
         visitedNodesInOrder = astar(grid, startNode, finishNode);
-        console.log(visitedNodesInOrder)
-
         break;
 
       case "dfs":
         visitedNodesInOrder = dfs(grid, startNode, finishNode);
-        console.log(visitedNodesInOrder)
         break;
 
       case "bfs":
         visitedNodesInOrder = bfs(grid, startNode, finishNode);
-        console.log('after function is done ......')
-        console.log(visitedNodesInOrder)
-
         break;
+
       case "randomWalls":
         let tmp = generateRandomWalls(grid, startNode, finishNode);
         this.mazeAnimation(tmp);
         this.setState({ isRunning: false });
         return;
+
       case "maze":
         let nodes = getAllNodes(grid);
         let wallsToAnimate = generateMaze(
@@ -407,6 +336,7 @@ export default class PathfindingVisualizer extends Component {
         this.mazeAnimation(wallsToAnimate);
         this.setState({ isRunning: false });
         return;
+
       default:
         break;
     }
@@ -419,25 +349,17 @@ export default class PathfindingVisualizer extends Component {
 
     return (
       <>
-        <button onClick={() => this.visualizeAlgorithm("dijkstra")}>
-          Visualize Dijkstra's Algorithm
-        </button>
-        <button onClick={() => this.visualizeAlgorithm("aStar")}>
-          Visualize A* Algorithm
-        </button>
-        <button onClick={() => this.visualizeAlgorithm("dfs")}>
-          Visualize Depth First Search Algorithm
-        </button>
-        <button onClick={() => this.visualizeAlgorithm("bfs")}>
-          Visualize Breadth First Search Algorithm
-        </button>
-        <button onClick={() => this.clearGrid()}>Clear Graph</button>
-        <button onClick={() => this.visualizeAlgorithm("randomWalls")}>
-          Deploy random walls
-        </button>
-        <button onClick={() => this.visualizeAlgorithm("maze")}>
-          Generate Maze
-        </button>
+        <Navbar
+          dijkstra={() => this.visualizeAlgorithm("dijkstra")}
+          aStar={() => this.visualizeAlgorithm("aStar")}
+          dfs={() => this.visualizeAlgorithm("dfs")}
+          bfs={() => this.visualizeAlgorithm("bfs")}
+          clearGrid={() => this.clearGrid()}
+          randomWalls={() => this.visualizeAlgorithm("randomWalls")}
+          generateMaze={() => this.visualizeAlgorithm("maze")}
+          isRunning={this.state.isRunning}
+        />
+
         <div className="grid">
           {grid.map((row, rowIdx) => {
             return (
