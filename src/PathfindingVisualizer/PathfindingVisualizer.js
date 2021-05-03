@@ -361,16 +361,14 @@ export default class PathfindingVisualizer extends Component {
         this.setState({ isRunning: false });
         return;
       case "maze":
-        let nodes = getAllNodes(grid)
-         let wallsToAnimate = generateMaze(nodes, 0, 20, 0, 50, 'horizontal', false, 'wall', startNode, finishNode);
-         console.log(wallsToAnimate)
-        // mazeAnimation(wallsToAnimate);
+        let nodes = getAllNodes(grid);
+         let wallsToAnimate = generateMaze(nodes, 0, 20, 0, 50, 'horizontal', false, startNode, finishNode);
+        mazeAnimation(wallsToAnimate);
         this.setState({ isRunning: false });
         return;
       default:
         break;
     }
-    console.log("still continued ..............");
     nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
     this.animateAlgorithm(visitedNodesInOrder, nodesInShortestPathOrder);
   }

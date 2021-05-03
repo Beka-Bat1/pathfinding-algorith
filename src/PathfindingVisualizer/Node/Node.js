@@ -11,7 +11,6 @@ export default class Node extends Component {
       isWall,
       onMouseDown,
       onMouseEnter,
-      onMouseLeave,
       onMouseUp,
       row,
     } = this.props;
