@@ -10,6 +10,7 @@ import {
   generateMaze,
   mazeAnimation,
 } from "../algorithm/mazeAlgorithm";
+import { getAllNodes } from "../algorithm/basicFuncs/basicFunctions";
 
 export default class PathfindingVisualizer extends Component {
   state = {
@@ -360,8 +361,10 @@ export default class PathfindingVisualizer extends Component {
         this.setState({ isRunning: false });
         return;
       case "maze":
-         let wallsToAnimate = generateMaze(grid);
-        mazeAnimation(wallsToAnimate);
+        let nodes = getAllNodes(grid)
+         let wallsToAnimate = generateMaze(nodes, 0, 20, 0, 50, 'horizontal', false, 'wall', startNode, finishNode);
+         console.log(wallsToAnimate)
+        // mazeAnimation(wallsToAnimate);
         this.setState({ isRunning: false });
         return;
       default:
