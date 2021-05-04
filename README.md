@@ -3,6 +3,18 @@
 ![image](https://raw.githubusercontent.com/Beka-Bat1/visualizepathfinding.com/main/public/pathfinding.png)
 
 
+1. Green square - start Point. 
+2. Red square - end Point. 
+3. Blue square - Visited Node. 
+4. Black square - a Wall. 
+5. Yellow square - visited Node.
+
+### what you can do on the grid
+
+* you can deploy walls by pressing down mouse button on grid.
+* you can drag around Start and Finish Nodes by simply dragging them.
+* you can play around with algorithm and maze buttons.
+* and then you can clear grid by pressing red button.
 
 
 # Getting Started with Create React App
