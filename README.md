@@ -5,9 +5,9 @@
 
 1. Green square - start Point. 
 2. Red square - end Point. 
-3. Blue square - Visited Node. 
-4. Black square - a Wall. 
-5. Yellow square - visited Node.
+3. Black square - a wall.
+4. Blue square - visited Node. 
+6. Yellow square - shortestßpath Node.
 
 ### what you can do on the grid
 
